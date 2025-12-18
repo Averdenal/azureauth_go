@@ -1,6 +1,7 @@
 package azureauth
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/MicahParks/keyfunc"
@@ -69,6 +70,8 @@ type GraphUserData struct {
 	DisplayName       string   `json:"displayName"`
 	OtherMails        []string `json:"otherMails"`
 	ProxyAddresses    []string `json:"proxyAddresses"`
+	HTTPStatusCode    int      `json:"httpStatusCode"` // Code de statut HTTP de la réponse
+	ErrorMessage      string   `json:"errorMessage"`   // Message d'erreur si applicable
 }
 
 // GraphTokenResponse représente la réponse de l'API de token OAuth2
@@ -78,4 +81,13 @@ type graphTokenResponse struct {
 	ExpiresIn   int    `json:"expires_in"`
 	Error       string `json:"error"`
 	ErrorDesc   string `json:"error_description"`
+}
+
+// UserNotFoundError est retournée lorsque l'utilisateur n'existe pas dans Azure AD
+type UserNotFoundError struct {
+	OID string
+}
+
+func (e *UserNotFoundError) Error() string {
+	return fmt.Sprintf("utilisateur non trouvé dans Azure AD: %s", e.OID)
 }
