@@ -315,11 +315,14 @@ func (s *azureAuthService) GetUserGraphData(oid string, selectFields []string) (
 		return nil, fmt.Errorf("erreur lors de la lecture de la réponse Graph: %w", err)
 	}
 
+	var userData GraphUserData
+	userData.HTTPStatusCode = resp.StatusCode
+
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("erreur lors de la récupération des données Graph (status %d): %s", resp.StatusCode, string(body))
+		userData.ErrorMessage = string(body)
+		return &userData, nil
 	}
 
-	var userData GraphUserData
 	if err := json.Unmarshal(body, &userData); err != nil {
 		return nil, fmt.Errorf("erreur lors du décodage des données Graph: %w", err)
 	}
